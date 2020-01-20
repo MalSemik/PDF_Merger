@@ -38,7 +38,7 @@ while True:
             # MERGE
             if values['merge']:
                 pdf_path = check_if_selected_file('pdfs')
-                if pdf_path == None:
+                if pdf_path is None:
                     continue
                 pdfs = values['_FILES_'].split(';')
                 merger = PdfFileMerger(strict=False)
@@ -49,7 +49,7 @@ while True:
                 # merger.append(pdf, pages=(0, 6, 2))  # pages 1,3, 5
             else:
                 pdf_path = check_if_selected_file('pdf')
-                if pdf_path == None:
+                if pdf_path is None:
                     continue
                 pdf = values['_FILE_'].split(';')
                 merger = PdfFileMerger(strict=False)
