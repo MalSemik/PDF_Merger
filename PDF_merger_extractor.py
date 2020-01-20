@@ -11,7 +11,7 @@ def check_if_selected_file(key):
 
 
 pdfs = []
-color = 'Dark'
+color = 'DarkGrey6'
 sg.change_look_and_feel(color)
 
 layout = [
