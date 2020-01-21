@@ -29,81 +29,85 @@ extract_layout = [[sg.Text('Choose file from which you want to extract pages:', 
                    sg.Input(key='stop', size=(10, 1))],
                   [sg.Text('Write the name of a new file')],
                   [sg.Input(size=(35, 10), key='INPUT')],
+                  [sg.Text()],
                   [sg.Ok(key="extract")]]
 
 layout = [
-    [sg.TabGroup([[sg.Tab('Merge', merge_layout), sg.Tab('Extract', extract_layout)]])],
-    [sg.Cancel()]]
+    [sg.TabGroup([[sg.Tab('Merge', merge_layout), sg.Tab('Extract', extract_layout)]])]]
 
 # Create the Window
 window = sg.Window('PDF MERGER', layout, resizable=True)
 # Event Loop to process "events"
 while True:
-    # try:
+    try:
 
-    event, values = window.Read()
-    print(event, values)
-    if event == 'merge':
-        # MERGE
-        merger = PdfFileMerger(strict=False)
-        pdf_path = check_if_selected_file('pdfs')
-        folder_path = check_if_selected_file('dir')
-        if pdf_path is None and folder_path is None:
-            sg.Popup(f'You need to select a file or a folder!')
-            continue
+        event, values = window.Read()
+        print(event, values)
+        if event == 'merge':
+            # MERGE
+            merger = PdfFileMerger(strict=False)
+            pdf_path = check_if_selected_file('pdfs')
+            folder_path = check_if_selected_file('dir')
+            if pdf_path is None and folder_path is None:
+                sg.Popup(f'Please select a file or a folder')
+                continue
 
-        if folder_path is None:
-            pdfs = values['_FILES_'].split(';')
+            if folder_path is None:
+                pdfs = values['_FILES_'].split(';')
 
+            else:
+                selected_folder = values['FOLDER']
+                print(os.listdir(selected_folder))
+                files = os.listdir(selected_folder)
+
+                for file in files:
+                    if file.endswith(".pdf"):
+                        pdfs.append(file)
+
+            for pdf in pdfs:
+                merger.append(pdf)
+
+            name_merged = values['name_merged']
+            print(name_merged)
+            if name_merged == "":
+                sg.Popup('Please insert a name of a new file')
+                continue
+            merger.write(f"{name_merged}.pdf")
+            merger.close()
+            sg.Popup('All done')
         else:
-            selected_folder = values['FOLDER']
-            print(os.listdir(selected_folder))
-            files = os.listdir(selected_folder)
+            pdf_to_extract_path = check_if_selected_file('pdf_extract')
+            if pdf_to_extract_path is None:
+                sg.Popup('Please select a pdf file')
+                continue
+            pdf = values['_FILE_'].split(';')
+            merger = PdfFileMerger(strict=False)
 
-            for file in files:
-                if file.endswith(".pdf"):
-                    pdfs.append(file)
+            start = int(values['start']) - 1
+            stop = int(values['stop'])
 
-        for pdf in pdfs:
-            merger.append(pdf)
+            for page in pdf:
+                # merger.append(page)
+                merger.append(page, pages=(start, stop))  # first 3 pages
+            # merger.append(pdf, pages=(0, 6, 2))  # pages 1,3, 5
 
-        name_merged = values['name_merged']
-        print(name_merged)
-        if name_merged == "":
-            sg.Popup('Please insert a name of a new file')
-            continue
-        merger.write(f"{name_merged}.pdf")
-        merger.close()
-        sg.Popup('All done')
-    else:
-        pdf_to_extract_path = check_if_selected_file('pdf_extract')
-        if pdf_to_extract_path is None:
-            continue
-        pdf = values['_FILE_'].split(';')
-        merger = PdfFileMerger(strict=False)
-
-        start = int(values['start']) - 1
-        stop = int(values['stop'])
-
-        for page in pdf:
-            # merger.append(page)
-            merger.append(page, pages=(start, stop))  # first 3 pages
-        # merger.append(pdf, pages=(0, 6, 2))  # pages 1,3, 5
-
-        # NAME A NEW FILE
-        name = values['INPUT']
-        print(name)
-        if name == "":
-            sg.Popup('Please insert a name of a new file')
-            continue
-        #
-        merger.write(f"{name}.pdf")
-        merger.close()
-        sg.Popup('All done')
-        if event in (None, 'Cancel'):
-            break
-
-# except Exception as e:
-#     sg.Popup(f'Something went wrong\n {e}')
+            # NAME A NEW FILE
+            name = values['INPUT']
+            print(name)
+            if name == "":
+                sg.Popup('Please insert a name of a new file')
+                continue
+            #
+            merger.write(f"{name}.pdf")
+            merger.close()
+            sg.Popup('All done')
+            if event == 'Cancel':
+                window.Close()
+            else:
+                break
+    except TypeError:
+        break
+    except Exception as e:
+        sg.Popup(f'Something went wrong\n {e}')
 
 window.Close()
