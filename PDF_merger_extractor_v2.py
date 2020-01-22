@@ -12,8 +12,8 @@ def check_if_selected_file(key):
 
 
 pdfs = []
-color = 'Dark'
-sg.change_look_and_feel(color)
+# color = 'Dark'
+# sg.change_look_and_feel('Light')
 
 merge_layout = [[sg.Text('Choose files you want to merge:', size=(50, 1))],
                 [sg.Input(key='_FILES_'), sg.FilesBrowse(button_text='Choose pdf files', key='pdfs')],
@@ -23,17 +23,17 @@ merge_layout = [[sg.Text('Choose files you want to merge:', size=(50, 1))],
                 [sg.Input(size=(35, 10), key='name_merged')],
                 [sg.Ok(key="merge")]
                 ]
-extract_layout = [[sg.Text('Choose file from which you want to extract pages:', size=(50, 1))],
+extract_layout = [[sg.Text('Choose the file from which you want to extract pages:', size=(50, 1))],
                   [sg.Input(key='_FILE_'), sg.FileBrowse(button_text='Choose pdf file', key='pdf_extract')],
                   [sg.Text('From:'), sg.Input(key='start', size=(10, 1)), sg.Text('To:'),
                    sg.Input(key='stop', size=(10, 1))],
                   [sg.Text('Write the name of a new file')],
                   [sg.Input(size=(35, 10), key='INPUT')],
-                  [sg.Text()],
+                  [sg.Text("")],
                   [sg.Ok(key="extract")]]
 
 layout = [
-    [sg.TabGroup([[sg.Tab('Merge', merge_layout), sg.Tab('Extract', extract_layout)]])]]
+    [sg.TabGroup([[sg.Tab('Merge', merge_layout,title_color='black'), sg.Tab('Extract', extract_layout)]])]]
 
 # Create the Window
 window = sg.Window('PDF MERGER', layout, resizable=True)
@@ -75,7 +75,7 @@ while True:
             merger.write(f"{name_merged}.pdf")
             merger.close()
             sg.Popup('All done')
-        else:
+        elif event == "extract":
             pdf_to_extract_path = check_if_selected_file('pdf_extract')
             if pdf_to_extract_path is None:
                 sg.Popup('Please select a pdf file')
@@ -105,6 +105,8 @@ while True:
                 window.Close()
             else:
                 break
+        else:
+            break
     except TypeError:
         break
     except Exception as e:
